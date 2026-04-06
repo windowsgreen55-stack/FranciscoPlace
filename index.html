@@ -9,11 +9,10 @@
 body {
     margin: 0;
     background: black;
-    font-family: Arial;
-    color: white;
+    font-family: Arial, sans-serif;
 }
 
-/* tela inicial */
+/* TELA INICIAL */
 #home {
     display: flex;
     height: 100vh;
@@ -30,14 +29,14 @@ body {
 .img-box img {
     max-width: 80%;
     border: 3px solid white;
-    transition: 0.3s;
+    transition: 0.2s;
 }
 
 .img-box img:hover {
     transform: scale(1.05);
 }
 
-/* chat */
+/* CHAT */
 #chatScreen {
     display: none;
     height: 100vh;
@@ -49,16 +48,17 @@ body {
     position: absolute;
     left: 20px;
     top: 50px;
-    width: 300px;
-    height: 400px;
+    width: 320px;
+    height: 420px;
     background: #00ff00;
     display: flex;
     flex-direction: column;
+    border: 2px solid black;
 }
 
 .chatbox-header {
     background: #00cc00;
-    padding: 5px;
+    padding: 6px;
     font-weight: bold;
     color: black;
 }
@@ -66,10 +66,18 @@ body {
 .messages {
     flex: 1;
     overflow-y: auto;
-    background: #f0f0f0;
+    background: #f5f5f5;
     color: black;
-    padding: 5px;
-    font-size: 12px;
+    padding: 6px;
+    font-size: 13px;
+}
+
+.message {
+    margin-bottom: 4px;
+}
+
+.message span {
+    font-weight: bold;
 }
 
 .input-area {
@@ -79,14 +87,15 @@ body {
 .input-area input {
     flex: 1;
     border: none;
-    padding: 5px;
+    padding: 6px;
+    outline: none;
 }
 
 .input-area button {
     background: black;
     color: white;
     border: none;
-    padding: 5px;
+    padding: 6px 10px;
     cursor: pointer;
 }
 </style>
@@ -94,6 +103,7 @@ body {
 
 <body>
 
+<!-- TELA 1 -->
 <div id="home">
     <div class="img-box" onclick="clickHousel()">
         <img src="housel.jpg">
@@ -104,13 +114,14 @@ body {
     </div>
 </div>
 
+<!-- CHAT -->
 <div id="chatScreen">
     <div class="chatbox">
         <div class="chatbox-header">chatbox</div>
-        <div class="messages" id="messages"></div>
+        <div id="messages" class="messages"></div>
 
         <div class="input-area">
-            <input id="msgInput" placeholder="Digite...">
+            <input id="msgInput" placeholder="Digite..." />
             <button onclick="sendMsg()">OK</button>
         </div>
     </div>
@@ -134,11 +145,13 @@ const db = getFirestore(app);
 
 let username = "anon";
 
-window.clickHousel = function() {
+/* clique esquerda */
+window.clickHousel = function () {
     alert("????");
-}
+};
 
-window.openChat = function() {
+/* abrir chat */
+window.openChat = function () {
     document.getElementById("home").style.display = "none";
     document.getElementById("chatScreen").style.display = "block";
 
@@ -146,11 +159,12 @@ window.openChat = function() {
     if (!username) username = "anon";
 
     loadMessages();
-}
+};
 
-window.sendMsg = async function() {
+/* enviar mensagem */
+window.sendMsg = async function () {
     const input = document.getElementById("msgInput");
-    const text = input.value;
+    const text = input.value.trim();
 
     if (!text) return;
 
@@ -161,8 +175,9 @@ window.sendMsg = async function() {
     });
 
     input.value = "";
-}
+};
 
+/* carregar mensagens */
 function loadMessages() {
     const q = query(collection(db, "chat"), orderBy("time"));
 
@@ -172,8 +187,11 @@ function loadMessages() {
 
         snapshot.forEach(doc => {
             const data = doc.data();
+
             const div = document.createElement("div");
-            div.textContent = data.user + ": " + data.msg;
+            div.className = "message";
+            div.innerHTML = `<span>${data.user}:</span> ${data.msg}`;
+
             messagesDiv.appendChild(div);
         });
 
